@@ -20,10 +20,10 @@ Please find below the more appropriated mode depending on your setup.
 
 ""How to"" for each mode is described below into this document.
 
-| Major Use cases / Setup                                                                                                                                                                             | CP_Serial_boot<br />(Preferred) |         Console_SH         |                                             Console_UART                                             | CP_Dev_Boot |
+| Major Use cases / Setup                                                                                                                                                                             | CP_Serial_boot<br /> |         Console_SH         |                                             Console_UART                                             | CP_Dev_Boot |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-----------------------------: | :------------------------: | :---------------------------------------------------------------------------------------------------: | :---------: |
-| * Board with USB DFU or UART serial if<br />*[ STM32CubeProgrammer](https://wiki.st.com/stm32mpu/wiki/STM32CubeProgrammer_release_note) PC tool installed (v1.12.0 minimum)                            | X<br />USB KO for MP2xx devices |                            |                                                                                                      |            |
-| * Board with Debug port<br />* [STM32CubeIDE](https://wiki.st.com/stm32mpu/wiki/STM32CubeIDE_release_note) PC tool installed (v1.11.0 minimum) <br />* STM32CubeIDE 1.11.0.22_MP2-D2 for MP2 devices |                                | X<br />Partially supported |                                                                                                      |            |
+| * Board with USB DFU or UART serial if<br />*[ STM32CubeProgrammer](https://wiki.st.com/stm32mpu/wiki/STM32CubeProgrammer_release_note) PC tool installed (v1.13.0 minimum)                            | X<br /> |                            |                                                                                                      |            |
+| * Board with Debug port<br />* STM32CubeIDE 1.12.0.23_MP2-D3 |                                | X<br /> |                                                                                                      |            |
 | * Board with Debug port and 1 UART interface<br />* Semihosting (Terminal I/O through debug port)<br /> NOT available on PC                                                                       |                                |                            | X<br />Note: need to<br />modify UART<br />instance in source code <br />if different from ST boards |            |
 | * Need to debug your own tool based on this package                                                                                                                                                |                                |                            |                                                                                                      |      X      |
 
@@ -108,16 +108,6 @@ In this mode, you will use STM32CubeIDE and build config Console_SH
 * Build Project by selecting Console_SH build confiuration
 * Setup Debug Configuration as below and in particular (in Startup tab).
 
-For STM32MP2 , TCP redirection does not work
-
-```
-monitor reset
-monitor halt
-mon arm semihosting enable
-```
-
-For STM32MP1xx:
-
 ```
 monitor reset
 monitor halt
@@ -129,11 +119,7 @@ mon arm semihosting_redirect tcp 2323
 
 ![](_htmresc/1668782761216.png)
 
-* Run Debug configuration
-* In a shell, run following command to get *User> prompt*
-  * $netcat localhost 2323
-  * Note: in future CubeIDE version, connection to TCP port will be done inside STM32CubeIDE with opening any shell
-  * **Note: !!! it works only on Ubuntu !!!**
+* Run Debug configuration and Open TCP window with localhost and port number as described below (Window ->Show View-> Other-> TCP Console)
 * Some command examples:
 
 ```
@@ -143,7 +129,8 @@ mon arm semihosting_redirect tcp 2323
   $write word=10 value=1
 ```
 
-![1668782420376](_htmresc/1668782420376.png)
+![1668782420376](_htmresc/OpenTCPWindow.PNG)
+![1668782420376](_htmresc/TCPWindow.PNG)
 
 ## How to Use Console_Uart
 
