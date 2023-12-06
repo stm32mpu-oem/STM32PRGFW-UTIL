@@ -50,7 +50,11 @@
 #elif defined (STM32MP257Cxx)
 #define RAM_START_ADDRESS                 0x20006000                           /* Start of RAM for OpenBL application use */
 #define RAM_SIZE                          (232U * 1024U)                       /* Size of RAM */
-#define BOOT_SEL_ITF_ADDRESS              0x20000044                           /* Boot selected interface Address */
+#if defined(CONFIG_STM32MP25X_REVA)
+#define BOOT_SEL_ITF_ADDRESS              (0x20000044)                         /* Boot selected interface Address */
+#else
+#define BOOT_SEL_ITF_ADDRESS              (0x20000044 + 0x20)                   /* Boot selected interface Address */
+#endif /* CONFIG_STM32MP25X_REVA */
 #define OPENBL_RAM_SIZE                   (160U * 1024U)                        /* Start downloading after this project memory space used */
 #endif
 

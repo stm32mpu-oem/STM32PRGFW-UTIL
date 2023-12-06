@@ -20,15 +20,77 @@
 CompilerPath="${1}"
 elf_file_basename="${2}"
 
+# Default parameters
+header_version="2.2"
+cpu_name="8-A"
 debug=0
 
-local_script_path=$(dirname $0)
-local_script_path=$(readlink -f ${local_script_path})
-
+# Default memory mapping
 sysram_start_lowbits=0x00000000
 sysram_end_lowbits=0x0003FFFF
 retram_start_lowbits=0x00080000
 retram_end_lowbits=0x0009FFFF
+
+local_script_path=$(dirname $0)
+local_script_path=$(readlink -f ${local_script_path})
+
+while [[ $# -gt 2 ]]; do
+    key="$3"
+
+    case $key in
+        -v|--version)
+        version="$4"
+        shift
+        shift
+        ;;
+        -c|--cpu)
+        cpu="$4"
+        shift
+        shift
+        ;;
+        *) echo "Wrong parameter : $3"
+        exit 1
+        ;;
+  esac
+done
+
+if [ -n "$version" ] ; then
+  case "$version" in
+    2.0)
+      header_version="$version"
+      ;;
+    2.1)
+      header_version="$version"
+      ;;
+    2.2)
+      header_version="$version"
+      ;;
+    *)
+      echo "ERROR header version not supported : $version"
+      exit 1
+	  ;;
+  esac
+fi
+echo "header_version = $header_version"
+
+if [ -n "$cpu" ] ; then
+  case "$cpu" in
+    8-A)
+      cpu_name="$cpu"
+      ;;
+    8-M.MAIN)
+      cpu_name="$cpu"
+      ;;
+    6S-M)
+      cpu_name="$cpu"
+      ;;
+    *)
+      echo "ERROR cpu name not supported : $cpu"
+      exit 1
+	  ;;
+  esac
+fi
+echo "cpu_name = $cpu_name"
 
 case "$(uname -s)" in
   Linux)
@@ -38,7 +100,7 @@ case "$(uname -s)" in
     cmd="python"
     ;;
   *)
-    #line for window executeable
+    #line for window executable
     echo Postbuild with windows executable
     imgtool="${local_script_path}/exe.win-amd64-2.7/Stm32ImageAddHeader.exe"
     cmd=""
@@ -64,7 +126,9 @@ if [ ${debug} -ne 0 ] ; then
   echo "<D> formatted_ep_addr           =<$formatted_ep_addr>"
 fi
 
+if [ ${cpu_name} == "" ] ; then
 cpu_name=$(${readelf_path} -A ${elf_file_basename}.elf | grep "Tag_CPU_name" | sed -e 's/.*Tag_CPU_name: *\"\([^\"]*\)\"/\1/')
+fi
 
 if [ ${debug} -ne 0 ] ; then
   echo "<D> cpu_name                    =<$cpu_name>"
@@ -84,7 +148,7 @@ else
   exit 1
 fi
 
-${objcopy_path} -O binary ${elf_file_basename}.elf ${elf_file_basename}_postbuild.bin
+${objcopy_path} -O binary ${elf_file_basename}.elf ${elf_file_basename}_pb.bin
 
 if [ "${core}" == "CA35" ] ; then
   binary_type="0x00"
@@ -126,36 +190,36 @@ if [ "${core}" == "CA35" ] ; then
   formatted_el3_launcher_end_addr="0x0e${formatted_el3_launcher_end_addr:4:6}"
   el3_launcher_end_offset=$((formatted_el3_launcher_end_addr-0x0E000000))
 
-  cp ${local_script_path}/EL3_Launcher/STM32MP2_el3_launcher.bin ${elf_file_basename}_padded_el3launcher.bin
+  cp ${local_script_path}/EL3_Launcher/STM32MP2_el3_launcher.bin ${elf_file_basename}_pad_el3lnch.bin
   el3_launcher_size=$(stat -c%s ${local_script_path}/EL3_Launcher/STM32MP2_el3_launcher.bin)
   el3_launcher_padding_size=$((el3_launcher_end_offset-el3_launcher_size-0x2600))
 
   no_el3_launcher_padding_size=$((el3_launcher_end_offset-0x2600))
 
   if [ ${debug} -ne 0 ] ; then
-    echo "<D> el3_launcher_entry_point    =<$el3_launcher_entry_point>"
-    echo "<D> formatted_el3_ep_addr       =<$formatted_el3_ep_addr>"
-    echo "<D> el3_launcher_ep_addr_for_image =<$el3_launcher_ep_addr_for_image>"
-    echo "<D> el3_launcher_end_addr       =<$el3_launcher_end_addr>"
-    echo "<D> formatted_el3_launcher_end_addr  =<$formatted_el3_launcher_end_addr>"
-    echo "<D> el3_launcher_size           =<$el3_launcher_size>"
-    echo "<D> el3_launcher_padding_size   =<$el3_launcher_padding_size>"
+    echo "<D> el3_launcher_entry_point        =<$el3_launcher_entry_point>"
+    echo "<D> formatted_el3_ep_addr           =<$formatted_el3_ep_addr>"
+    echo "<D> el3_launcher_ep_addr_for_image  =<$el3_launcher_ep_addr_for_image>"
+    echo "<D> el3_launcher_end_addr           =<$el3_launcher_end_addr>"
+    echo "<D> formatted_el3_launcher_end_addr =<$formatted_el3_launcher_end_addr>"
+    echo "<D> el3_launcher_size               =<$el3_launcher_size>"
+    echo "<D> el3_launcher_padding_size       =<$el3_launcher_padding_size>"
   fi
-  dd if=/dev/zero bs=1 count=${el3_launcher_padding_size} >>${elf_file_basename}_padded_el3launcher.bin 2>/dev/null
-  cat ${elf_file_basename}_padded_el3launcher.bin ${elf_file_basename}_postbuild.bin >${elf_file_basename}_postbuild_el3launcher.bin
-  # Add padding in place of el3 launcher for no_el3_launcher image
-  dd if=/dev/zero bs=1 count=${no_el3_launcher_padding_size} >${elf_file_basename}_no_el3_launcher_padding.bin 2>/dev/null
-  cat ${elf_file_basename}_no_el3_launcher_padding.bin ${elf_file_basename}_postbuild.bin >${elf_file_basename}_postbuild_no_el3launcher.bin
+  dd if=/dev/zero bs=1 count=${el3_launcher_padding_size} >>${elf_file_basename}_pad_el3lnch.bin 2>/dev/null
+  cat ${elf_file_basename}_pad_el3lnch.bin ${elf_file_basename}_pb.bin >${elf_file_basename}_pb_el3lnch.bin
+  # Add padding in place of el3 launcher for no_el3lnch image
+  dd if=/dev/zero bs=1 count=${no_el3_launcher_padding_size} >${elf_file_basename}_no_el3lnch_pad.bin 2>/dev/null
+  cat ${elf_file_basename}_no_el3lnch_pad.bin ${elf_file_basename}_pb.bin >${elf_file_basename}_pb_no_el3lnch.bin
 fi
 
 if [ "${core}" == "CA35" ] ; then
-  command="${cmd} ${imgtool} ${elf_file_basename}_postbuild_el3launcher.bin ${elf_file_basename}.stm32 -bt ${binary_type} -ep ${el3_launcher_ep_addr_for_image}"
+  command="${cmd} ${imgtool} ${elf_file_basename}_pb_el3lnch.bin ${elf_file_basename}.stm32 -bt ${binary_type} -ep ${el3_launcher_ep_addr_for_image} -hv ${header_version}"
   ${command}
   ret=$?
   if [ ${debug} -ne 0 ] ; then
     echo "<D> ret                         =<$ret>"
   fi
-  command="${cmd} ${imgtool} ${elf_file_basename}_postbuild_no_el3launcher.bin ${elf_file_basename}_no_el3_launcher.stm32 -bt ${binary_type} -ep ${ep_addr_for_image}"
+  command="${cmd} ${imgtool} ${elf_file_basename}_pb_no_el3lnch.bin ${elf_file_basename}_no_el3lnch.stm32 -bt ${binary_type} -ep ${ep_addr_for_image} -hv ${header_version}"
   ${command}
   ret2=$?
   ret=$((ret+ret2))
@@ -164,23 +228,23 @@ if [ "${core}" == "CA35" ] ; then
     echo "<D> ret2                        =<$ret2>"
   fi
 else
-  command="${cmd} ${imgtool} ${elf_file_basename}_postbuild.bin ${elf_file_basename}.stm32 -bt ${binary_type} -ep ${ep_addr_for_image}"
+  command="${cmd} ${imgtool} ${elf_file_basename}_pb.bin ${elf_file_basename}.stm32 -bt ${binary_type} -ep ${ep_addr_for_image} -hv ${header_version}"
   ${command}
   ret=$?
 fi
 
 if [ ${debug} -eq 0 ] ; then
-  rm -f ${elf_file_basename}_postbuild.bin
-  rm -f ${elf_file_basename}_postbuild_el3launcher.bin
-  rm -f ${elf_file_basename}_padded_el3launcher.bin
-  rm -f ${elf_file_basename}_no_el3_launcher_padding.bin
-  rm -f ${elf_file_basename}_postbuild_no_el3launcher.bin
+  rm -f ${elf_file_basename}_pb.bin
+  rm -f ${elf_file_basename}_pb_el3lnch.bin
+  rm -f ${elf_file_basename}_pad_el3lnch.bin
+  rm -f ${elf_file_basename}_no_el3lnch_pad.bin
+  rm -f ${elf_file_basename}_pb_no_el3lnch.bin
 fi
 
 if [ ${ret} -eq 0 ] ; then
   if [ "${core}" == "CA35" ] ; then
     echo "${elf_file_basename}.elf stm32 image header and EL3 launcher added. Output file: ${elf_file_basename}.stm32"
-    echo "${elf_file_basename}.elf stm32 image header added. Output file: ${elf_file_basename}_no_el3_launcher.stm32"
+    echo "${elf_file_basename}.elf stm32 image header added. Output file: ${elf_file_basename}_no_el3lnch.stm32"
   else
     echo "${elf_file_basename}.elf stm32 image header added. Output file: ${elf_file_basename}.stm32"
   fi

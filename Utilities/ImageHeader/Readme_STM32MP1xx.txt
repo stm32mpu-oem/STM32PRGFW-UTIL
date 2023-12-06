@@ -47,9 +47,9 @@ About arguments:
                                                That's one "../" more than from folder containing .cproject
 * "postbuild_STM32MP15.sh" or "postbuild_STM32MP13.sh"  -> bash script file to generate the STM32MP15 or STM32MP13 Image Header
 * "${gnu_tools_for_stm32_compiler_path}"  -> STM32CubeIDE variable containing path to GCC toolchain
-                                               used by postbuild_STM32MP2.sh to extract information from application .elf file
+                                               used by postbuild_STM32MPxx.sh to extract information from application .elf file
 * "${BuildArtifactFileBaseName}"          -> STM32CubeIDE variable containing base name of application .elf file
-                                               Used by postbuild_STM32MP2.sh to get .elf file and generate Images names
+                                               Used by postbuild_STM32MPxx.sh to get .elf file and generate Images names
 
 To generate the Image Header, the "postbuild_STM32MP15.sh" or  "postbuild_STM32MP13.sh" script will automatically select either the Python script "Stm32ImageAddHeader.py" on Linux OS
 or the windows executable "Stm32ImageAddHeader.exe" on Windows OS

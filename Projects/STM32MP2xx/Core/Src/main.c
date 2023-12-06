@@ -43,7 +43,6 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
-
   /* Reset of all peripherals, Initialize the Systick. */
   HAL_Init();
 
@@ -293,6 +292,16 @@ void Error_Handler(void)
   {
   }
 }
+
+#if defined (__CONSOLE__)
+#if defined(__TERMINAL_IO__)
+int _kill(int pid, int sig)
+{
+    return -1;
+}
+
+#endif
+#endif
 
 #ifdef  USE_FULL_ASSERT
 /**

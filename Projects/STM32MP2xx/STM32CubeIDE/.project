@@ -37,9 +37,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/STM32CubeIDE/syscalls.c</locationURI>
 		</link>
 		<link>
-			<name>Documentation/readme.txt</name>
+			<name>Application/Core/hash_util.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Documentation/readme.txt</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/Common/Core/Src/hash_util.c</locationURI>
 		</link>
 		<link>
 			<name>Application/Core/main.c</name>
@@ -50,6 +50,11 @@
 			<name>Application/Core/otp_util.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Common/Core/Src/otp_util.c</locationURI>
+		</link>
+		<link>
+			<name>Application/Core/pmic_util.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Common/Core/Src/pmic_util.c</locationURI>
 		</link>
 		<link>
 			<name>Application/Core/stm32mp2xx_hal_msp.c</name>
@@ -110,6 +115,21 @@
 			<name>Drivers/STM32MP2xx_HAL_Driver/stm32mp2xx_hal_gpio.c</name>
 			<type>1</type>
 			<locationURI>PARENT-3-PROJECT_LOC/Drivers/STM32MP2xx_HAL_Driver/Src/stm32mp2xx_hal_gpio.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32MP2xx_HAL_Driver/stm32mp2xx_hal_hash.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Drivers/STM32MP2xx_HAL_Driver/Src/stm32mp2xx_hal_hash.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32MP2xx_HAL_Driver/stm32mp2xx_hal_hash_ex.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Drivers/STM32MP2xx_HAL_Driver/Src/stm32mp2xx_hal_hash_ex.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32MP2xx_HAL_Driver/stm32mp2xx_hal_i2c.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Drivers/STM32MP2xx_HAL_Driver/Src/stm32mp2xx_hal_i2c.c</locationURI>
 		</link>
 		<link>
 			<name>Drivers/STM32MP2xx_HAL_Driver/stm32mp2xx_hal_pcd.c</name>
@@ -187,9 +207,19 @@
 			<locationURI>PARENT-2-PROJECT_LOC/Common/OpenBootloader/Target/external_memory_interface.c</locationURI>
 		</link>
 		<link>
+			<name>Application/Openbootloader/Target/hash_interface.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Common/OpenBootloader/Target/hash_interface.c</locationURI>
+		</link>
+		<link>
 			<name>Application/Openbootloader/Target/otp_interface.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Common/OpenBootloader/Target/otp_interface.c</locationURI>
+		</link>
+		<link>
+			<name>Application/Openbootloader/Target/pmic_interface.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Common/OpenBootloader/Target/pmic_interface.c</locationURI>
 		</link>
 		<link>
 			<name>Application/Openbootloader/Target/ram_interface.c</name>

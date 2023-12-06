@@ -65,7 +65,7 @@ To generate the Image Header, the "postbuild_STM32MP2.sh" script will automatica
 
 **** Generated files
   ${BuildArtifactFileBaseName}.stm32                        -> Default image to by written to SDCard in selected slot
-                                                                Generated fot A35 and M33 applications
+                                                                Generated for A35 and M33 applications
                                                                 For A35 this is the image which contains the EL3_Launcher and is suitable for a part with A35 booting in Aarch64 mode
   ${BuildArtifactFileBaseName}_no_el3_launcher_.stm32       -> No EL3 Launcher image to by written to SDCard in selected slot
                                                                 Generated only for A35 applications

@@ -650,7 +650,7 @@ void SystemInit(void)
 
   /****************************************************************************/
   /* !!! WARNING !!!                                                          */
-  /* GIC400 is used on MP2 Panther for routing interrupts to A35 cores.       */
+  /* GIC400 is used on MP2 for routing interrupts to A35 cores.       */
   /* On May 2019, CMSIS latest version 5.5.1 still doesn't support Axx cores  */
   /* based on ARMv8-A architecture, and GIC driver still support only         */
   /* one group of interrupts (No Security Extension case).                    */

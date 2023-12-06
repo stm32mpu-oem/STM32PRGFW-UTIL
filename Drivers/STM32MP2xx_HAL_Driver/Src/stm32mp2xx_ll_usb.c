@@ -439,11 +439,17 @@ static void USB_Delay(uint32_t time_in_us)
 
 static uint32_t DWC3_RegRead(USB3_TypeDef *base, uint32_t offset)
 {
+#ifndef DMA_MEM_NON_BUFFERABLE
+  __DSB();
+#endif
   return DWC3_REG32(base, offset);
 }
 
 static void DWC3_RegWrite(USB3_TypeDef *base, uint32_t offset, uint32_t value)
 {
+#ifndef DMA_MEM_NON_BUFFERABLE
+  __DSB();
+#endif
   DWC3_REG32(base, offset) = value;
 }
 

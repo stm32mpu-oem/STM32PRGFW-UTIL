@@ -1153,7 +1153,7 @@ HAL_StatusTypeDef HAL_BSEC_OtpProgram(BSEC_HandleTypeDef *hbsec,
    * declare impossible to program falsely
    * -because in program verify case we want to manage the case where word otpWordIdx is Permanent Programming
    * locked.
-   * Note : to know that : there is only one solution in Panther : Reload Manually the word by a Read
+   * Note : to know that : there is only one solution in MP2 : Reload Manually the word by a Read
    * operation and check then bit 'BSEC_OTPSR.PPLF' bit that is updated (Perm Prog Lock flag)
    */
   

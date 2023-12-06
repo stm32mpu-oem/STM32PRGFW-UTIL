@@ -24,7 +24,7 @@
  *   "ARM Architecture Reference Manual - ARMv8, for ARMv8-A architecture profile"
  *   (file DDI0487B_a_armv8_arm.pdf)
  *
- * . [PANTHER_Memory_Map]
+ * . [MP2_Memory_Map]
  *   Chapter 2 "Memory and bus architecture"
  *   in "RM0457 - Reference Manual"
  *   "STM32MP25xx - advanced ARM-based 32/64-bit MPUs"
@@ -266,7 +266,7 @@ mair1_value:
         .endm
 
 /*--------------------------------------------------------*/
-/* Panther (MP2) EL1 First-level table                    */
+/* MP2 (MP2) EL1 First-level table                    */
 /*                                                        */
 /*   Entry 0: -> Second-level table "mp2_el1_ttb0_level2" */
 /*               (see its description hereafter)          */
@@ -306,7 +306,7 @@ mp2_el1_ttb1_base:
 
 /*---------------------------------------------------------------------------*/
 /* Set memory mapping in [0x0000_0000; 0x3FFF_FFFF] area                     */
-/* according to [PANTHER_Memory_Map]                                         */
+/* according to [MP2_Memory_Map]                                         */
 /* Second-level table to embed all *RAM areas                                */
 /* --> 512 entries (2MB areas) VA = PA                                       */
 /*       =   1 for [0x0000_0000; 0x0020_0000[ : ROM (not-cached access)      */

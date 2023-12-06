@@ -707,7 +707,7 @@ uint32_t HAL_PWR_HasSystemBeenInStop(void)
   *
   * @note In Sleep mode, all I/O pins keep the same state as in Run mode.
   *
-  * @note In Sleep mode, Panther PWR module does not allow any update of voltage regulator value:
+  * @note In Sleep mode, MP2 PWR module does not allow any update of voltage regulator value:
   * @note Regulators are ON without any low power neither low voltage feature.
   * @note However, for compatibility reason, there is still a regulator argument
   *

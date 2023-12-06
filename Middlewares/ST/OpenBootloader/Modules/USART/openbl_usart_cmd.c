@@ -24,7 +24,12 @@
 #include "usart_interface.h"
 #include "external_memory_interface.h"
 #include "otp_interface.h"
+#include "pmic_interface.h"
 #include "openbl_util.h"
+
+#ifdef USE_HASH_OVER_OTP
+#include "hash_interface.h"
+#endif /* USE_HASH_OVER_OTP */
 
 /* External variables --------------------------------------------------------*/
 extern OPENBL_Flashlayout_TypeDef FlashlayoutStruct;
@@ -54,7 +59,9 @@ static uint32_t cur_part = 1;
 static OPENBL_Otp_TypeDef Otp;
 static uint32_t otp_idx_rp = 0;
 static uint32_t otp_idx_wm = 0;
-
+#ifdef USE_HASH_OVER_OTP
+static uint32_t hash_sent = 0U;
+#endif /* USE_HASH_OVER_OTP */
 /* Private function prototypes -----------------------------------------------*/
 static void OPENBL_USART_GetCommand(void);
 static void OPENBL_USART_GetVersion(void);
@@ -101,6 +108,10 @@ static void OPENBL_USART_GetCommand(void)
 
   /* Init usefull gloabl varialble */
   otp_idx_rp = 0;
+
+#ifdef USE_HASH_OVER_OTP
+  hash_sent = 0;
+#endif /* USE_HASH_OVER_OTP */
 
   const uint8_t a_OPENBL_USART_CommandsList[OPENBL_USART_COMMANDS_NB] =
   {
@@ -207,7 +218,7 @@ static void OPENBL_USART_GetPhase(void)
       }
       else /* Only none, nor are supported */
       {
-    	  OPENBL_USART_SendByte(NACK_BYTE);
+        OPENBL_USART_SendByte(NACK_BYTE);
       }
 
       /* Go to the next partition */
@@ -246,9 +257,9 @@ static void OPENBL_USART_GetPhase(void)
 }
 
 /**
- * @brief  This function is used to read memory from the device.
- * @retval None.
- */
+  * @brief  This function is used to read memory from the device.
+  * @retval None.
+  */
 static void OPENBL_USART_ReadMemory(void)
 {
   uint32_t address;
@@ -295,9 +306,9 @@ static void OPENBL_USART_ReadMemory(void)
 }
 
 /**
- * @brief  This function is used to write in to device memory.
- * @retval None.
- */
+  * @brief  This function is used to write in to device memory.
+  * @retval None.
+  */
 static void OPENBL_USART_Download(void)
 {
   uint32_t address;
@@ -353,7 +364,7 @@ static void OPENBL_USART_Download(void)
       /* If otp operation */
       if (operation == PHASE_OTP)
       {
-    	  /* If first otp packet */
+        /* If first otp packet */
         if (packet_number == 0)
         {
           /* Check otp version */
@@ -373,9 +384,9 @@ static void OPENBL_USART_Download(void)
         }
 
         /* Get otp word and status */
-        for (counter = 0 + offset; (counter < codesize) && (otp_idx_wm < OTP_PART_SIZE); counter+=4)
+        for (counter = 0 + offset; (counter < codesize) && (otp_idx_wm < OTP_PART_SIZE); counter += 4)
         {
-          Otp.OtpPart[otp_idx_wm] = (USART_RAM_Buf[counter] << 0) | (USART_RAM_Buf[counter+1] << 8) | (USART_RAM_Buf[counter+2] << 16) | (USART_RAM_Buf[counter+3] << 24);
+          Otp.OtpPart[otp_idx_wm] = (USART_RAM_Buf[counter] << 0) | (USART_RAM_Buf[counter + 1] << 8) | (USART_RAM_Buf[counter + 2] << 16) | (USART_RAM_Buf[counter + 3] << 24);
           otp_idx_wm++;
         }
 
@@ -387,7 +398,16 @@ static void OPENBL_USART_Download(void)
           /* Reset otp index */
           otp_idx_wm = 0;
           otp_idx_rp = 0;
+#ifdef USE_HASH_OVER_OTP
+          hash_sent = 0;
+#endif /* USE_HASH_OVER_OTP */
         }
+      }
+      else if (operation == PHASE_PMIC_NVM)
+      {
+        OPENBL_PMIC_Write(USART_RAM_Buf);
+
+        OPENBL_USART_SendByte(ACK_BYTE);
       }
       else /* If normal download operation */
       {
@@ -444,9 +464,9 @@ static void OPENBL_USART_Download(void)
 }
 
 /**
- * @brief  This function is used to read data from NVM, Flash.
- * @retval None.
- */
+  * @brief  This function is used to read data from NVM, Flash.
+  * @retval None.
+  */
 static void OPENBL_USART_ReadPartition(void)
 {
   uint32_t offset;
@@ -456,6 +476,7 @@ static void OPENBL_USART_ReadPartition(void)
   uint8_t data;
   uint8_t tmpOffset[4] = {0, 0, 0, 0};
   uint8_t partId;
+  uint8_t pmic_nvm_reg[PMIC_NVM_SIZE] = {0};
 
   OPENBL_USART_SendByte(ACK_BYTE);
 
@@ -477,78 +498,132 @@ static void OPENBL_USART_ReadPartition(void)
   }
   else
   {
-	  /* Get offset value */
-    offset = (((uint32_t)tmpOffset[3] << 24) | ((uint32_t)tmpOffset[2] << 16) | ((uint32_t)tmpOffset[1] << 8) | (uint32_t)tmpOffset[0]);
-
     /* Check if the partion ID is supported */
     switch (partId)
     {
-    case PHASE_OTP:
-      break;
-    default:
-    	OPENBL_USART_SendByte(NACK_BYTE);
-    }
+      case PHASE_OTP:
 
-    /* Save the operation type */
-    operation = partId;
+        /* Get offset value */
+        offset = (((uint32_t)tmpOffset[3] << 24) | ((uint32_t)tmpOffset[2] << 16) | ((uint32_t)tmpOffset[1] << 8) | (uint32_t)tmpOffset[0]);
 
-    /* Save the packet number */
-    packet_number = offset / OPENBL_USART_PACKET_SIZE;
+        /* Save the operation type */
+        operation = partId;
 
-    OPENBL_USART_SendByte(ACK_BYTE);
+        /* Save the packet number */
+        packet_number = offset / OPENBL_USART_PACKET_SIZE;
 
-    /* NbrOfData to read = data + 1 */
-    data = OPENBL_USART_ReadByte();
+        OPENBL_USART_SendByte(ACK_BYTE);
 
-    /* Number of data to be written = data + 1 */
-    codesize = (uint32_t)data + 1U;
+        /* NbrOfData to read = data + 1 */
+        data = OPENBL_USART_ReadByte();
 
-    /* Size for Word writing */
-    codesize /= 4;
+        /* Number of data to be written = data + 1 */
+        codesize = (uint32_t)data + 1U;
 
-    /* Checksum Initialization */
-    tmpXOR = data;
+        /* Size for Word writing */
+        codesize /= 4;
 
-    /* Get the data */
-    data = OPENBL_USART_ReadByte();
+        /* Checksum Initialization */
+        tmpXOR = data;
 
-    /* Check the integrity of received data */
-    if ((data ^ tmpXOR) != 0xFF)
-    {
-      OPENBL_USART_SendByte(NACK_BYTE);
-    }
+        /* Get the data */
+        data = OPENBL_USART_ReadByte();
 
-    OPENBL_USART_SendByte(ACK_BYTE);
+        /* Check the integrity of received data */
+        if ((data ^ tmpXOR) != 0xFF)
+        {
+          OPENBL_USART_SendByte(NACK_BYTE);
+        }
 
-    /* Read otp */
-    Otp = OPENBL_OTP_Read();
+        OPENBL_USART_SendByte(ACK_BYTE);
 
-    /* Check if first otp packet */
-    if (offset == 0)
-    {
-      /* Send the otp version */
-      OPENBL_USART_SendWord(Otp.Version);
+        /* Read otp */
+        Otp = OPENBL_OTP_Read();
 
-      /* Send the global state */
-      OPENBL_USART_SendWord(Otp.GlobalState);
+        /* Calculate Hash over OTP values */
+#ifdef USE_HASH_OVER_OTP
+        OPENBL_Hash_Calculate(&Otp);
+#endif
+        /* Check if first otp packet */
+        if (offset == 0)
+        {
+          /* Send the otp version */
+          OPENBL_USART_SendWord(Otp.Version);
 
-      /* Update codesize */
-      codesize -= 2;
-    }
+          /* Send the global state */
+          OPENBL_USART_SendWord(Otp.GlobalState);
 
-    /* Send otp words */
-    for (i=0; i < codesize; i++)
-    {
-      /* Send otp words until its end and send 0 after to fill */
-      if (otp_idx_rp < OTP_PART_SIZE)
-      {
-        OPENBL_USART_SendWord(Otp.OtpPart[otp_idx_rp]);
-        otp_idx_rp++;
-      }
-      else
-      {
-        OPENBL_USART_SendWord(0);
-      }
+          /* Update codesize */
+          codesize -= 2;
+        }
+#ifdef USE_HASH_OVER_OTP
+        for (i = 0; i < codesize; i++)
+        {
+          /* Send OTP words until its end and send 0 after to fill */
+          if (otp_idx_rp < OTP_PART_SIZE)
+          {
+            OPENBL_USART_SendWord(Otp.OtpPart[otp_idx_rp]);
+            otp_idx_rp++;
+          }
+          else
+          {
+            /* After OTP words, transfer the 32 bytes of Hash */
+            break;
+          }
+        }
+        /* Transfer 32 hash bytes*/
+        if ((otp_idx_rp >= OTP_PART_SIZE) && (hash_sent == 0))
+        {
+          for (uint8_t hash_idx = 0; hash_idx < OTP_HASH_SIZE; hash_idx++)
+          {
+            OPENBL_USART_SendByte(Otp.Sha256Hash[hash_idx]);
+          }
+          hash_sent = 1;
+          i += (OTP_HASH_SIZE / 4);
+        }
+        /* Transfer padding bytes */
+        for (uint8_t j = i; j < codesize; j++)
+        {
+          OPENBL_USART_SendWord(0);
+        }
+
+#else
+        /* Send OTP words */
+        for (i = 0; i < codesize; i++)
+        {
+          /* Send OTP words until its end and send 0 after to fill */
+          if (otp_idx_rp < OTP_PART_SIZE)
+          {
+            OPENBL_USART_SendWord(Otp.OtpPart[otp_idx_rp]);
+            otp_idx_rp++;
+          }
+          else
+          {
+            OPENBL_USART_SendWord(0);
+          }
+        }
+#endif /* USE_HASH_OVER_OTP */
+
+        break;
+
+      case PHASE_PMIC_NVM:
+        OPENBL_USART_SendByte(ACK_BYTE);
+        data = OPENBL_USART_ReadByte();
+        data = OPENBL_USART_ReadByte();
+        OPENBL_USART_SendByte(ACK_BYTE);
+        OPENBL_PMIC_Read(pmic_nvm_reg);
+
+        for (uint8_t idx = 0; idx < PMIC_NVM_SIZE; idx++)
+        {
+          OPENBL_USART_SendByte(*(pmic_nvm_reg + idx));
+        }
+
+        OPENBL_USART_SendByte(ACK_BYTE);
+
+        break;
+
+      default:
+        OPENBL_USART_SendByte(NACK_BYTE);
     }
   }
 }
@@ -570,15 +645,15 @@ static void OPENBL_USART_Start(void)
   }
   else
   {
-   /* If the jump address is valid then send ACK */
+    /* If the jump address is valid then send ACK */
     OPENBL_USART_SendByte(ACK_BYTE);
   }
 }
 
 /**
- * @brief  This function is used to get a valid address.
- * @retval Returns NACK status in case of error else returns ACK status.
- */
+  * @brief  This function is used to get a valid address.
+  * @retval Returns NACK status in case of error else returns ACK status.
+  */
 static uint8_t OPENBL_USART_GetAddress(uint32_t *Address)
 {
   uint8_t tmpAddress[4] = {0, 0, 0, 0};
@@ -599,7 +674,7 @@ static uint8_t OPENBL_USART_GetAddress(uint32_t *Address)
   }
   else
   {
-	  /* Get the start address */
+    /* Get the start address */
     *Address = (((uint32_t)tmpAddress[3] << 24) | ((uint32_t)tmpAddress[2] << 16) | ((uint32_t)tmpAddress[1] << 8) | (uint32_t)tmpAddress[0]);
 
     /* Get the operation type */
@@ -611,10 +686,10 @@ static uint8_t OPENBL_USART_GetAddress(uint32_t *Address)
     /* Check if the operation is supported */
     switch (operation)
     {
-    case PHASE_FLASHLAYOUT:
-      break;
-    default:
-      status = NACK_BYTE;
+      case PHASE_FLASHLAYOUT:
+        break;
+      default:
+        status = NACK_BYTE;
     }
 
     /* Check if the address is supported */

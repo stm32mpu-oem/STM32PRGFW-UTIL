@@ -69,9 +69,21 @@ extern "C" {
 #define FL_DESC_STR                    "@Flashlayout /0x00/1*1Ke"
 #define FSBL_EXT_DESC_STR              "@FSBL-EXT /0x03/1*70Ke"
 #define FSBL_APP_DESC_STR              "@FSBL-APP /0x04/1*64Me"
-#define OTP_DESC_STR                   "@OTP /0xF2/1*2920Be"
-//#define OTP_DESC_STR                   "@OTP /0xF2/1*776Be"
 
+/*On MP2:368 OTP = (2 * 368 + 2) * 4 bytes = 2952 bytes
+(for 32 bits word, with M = 0 to 367 (no access to HWKEY and STM32PRVKEY))
+On MP13 = (96*2+2)*4 = 776 bytes*/
+#if defined (STM32MP257Cxx)
+#define OTP_DESC_STR                   "@OTP /0xF2/1*2952Be"
+#else
+#define OTP_DESC_STR                   "@OTP /0xF2/1*776Be"
+#endif /*STM32MP257Cxx*/
+
+#if defined (STPMIC2)
+#define PMIC_NVM_STR                   "@PMIC /0xF4/1*42Be"
+#else
+#define PMIC_NVM_STR                   "@PMIC /0xF4/1*8Be"
+#endif /* STM32MP257Cxx */
 
 /**************************************************/
 /* DFU Requests  DFU states                       */

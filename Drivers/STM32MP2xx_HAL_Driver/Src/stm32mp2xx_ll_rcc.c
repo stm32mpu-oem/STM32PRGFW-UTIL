@@ -20,7 +20,7 @@
   */
 /* Todo
 MP2 Notes:
-This file isn't updated to work with panther yet
+This file isn't updated to work with MP2 yet
 */
 #if defined(USE_FULL_LL_DRIVER)
 
@@ -96,7 +96,7 @@ void LL_RCC_GetSystemClocksFreq(LL_RCC_ClocksTypeDef *RCC_Clocks)
 }
 
 //#else /* USE_STM32MP257CXX_FPGA */
-/* @TODO : Code below to be updated for Panther */
+/* @TODO : Code below to be updated for MP2 */
 
 /** @addtogroup RCC_LL
   * @{

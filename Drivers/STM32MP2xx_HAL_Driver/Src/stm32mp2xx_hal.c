@@ -245,7 +245,7 @@ __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 
 #elif defined (CORE_CM33)
   /* In Cortex-M33 case, configure SysTick period according to platform frequency */
-  /* Should be configured using M33 specifications (doc. Panther_M33_Cluster_v1.3.docx #1.6 pages 10-11) to set SysTick
+  /* Should be configured using M33 specifications (doc. MP2 M33_Cluster_v1.3.docx #1.6 pages 10-11) to set SysTick
    * !!!!!!!!!!!!!!
    * period according to source clock settings
    * !!!!!!!!!!!!!!

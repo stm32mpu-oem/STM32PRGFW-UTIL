@@ -79,11 +79,8 @@ void SysTick_Handler(void)
   */
 void USB3DR_IRQHandler(void)
 {
-	HAL_PCD_IRQHandler(&hpcd);
+  HAL_PCD_IRQHandler(&hpcd);
 }
 #endif
-/******************************************************************************/
-/* STM32MP2xx Peripheral Interrupt Handlers                                    */
-/******************************************************************************/
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
