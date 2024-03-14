@@ -19,10 +19,10 @@ Please find below the more appropriated mode depending on your setup.<br>
 
 | Major Use cases / Setup                                                                                                                                                                             | CP_Serial_boot<br /> |         Console_SH         |                                             Console_UART                                             | CP_Dev_Boot |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-----------------------------: | :------------------------: | :---------------------------------------------------------------------------------------------------: | :---------: |
-| * Board with USB DFU or UART serial if<br />*[ STM32CubeProgrammer](https://wiki.st.com/stm32mpu/wiki/STM32CubeProgrammer_release_note) PC tool installed (v0.0.0-MP25-B02 minimum)                     | X<br /> |                            |                                                                                                      |            |
-| * Board with Debug port<br />* STM32CubeIDE 1.13.1.23w43mp23 |                                | X<br /> |                                                                                                      |            |
-| * Board with Debug port and 1 UART interface<br />* Semihosting (Terminal I/O through debug port)<br /> NOT available on PC                                                                       |                                |                            | X<br />Note: need to<br />modify UART<br />instance in source code <br />if different from ST boards |            |
-| * Need to debug your own tool based on this package                                                                                                                                                |                                |                            |                                                                                                      |      X      |
+| * Board with USB DFU or UART serial if<br />*[ STM32CubeProgrammer](https://wiki.st.com/stm32mpu/wiki/STM32CubeProgrammer_release_note) PC tool installed (v0.0.0-MP25-B02 minimum)                     | &#10003;<br /> |                            |                                                                                                      |            |
+| * Board with Debug port<br />* STM32CubeIDE 1.13.1.23w43mp23 |                                | &#10003;<br /> |                                                                                                      |            |
+| * Board with Debug port and 1 UART interface<br />* Semihosting (Terminal I/O through debug port)<br /> NOT available on PC                                                                       |                                |                            | &#10003;<br />Note: need to<br />modify UART<br />instance in source code <br />if different from ST boards |            |
+| * Need to debug your own tool based on this package                                                                                                                                                |                                |                            |                                                                                                      |      &#10003;      |
 
 The functional chart of the project describing all applications mentioned above:
 
@@ -46,7 +46,12 @@ In this section, you will  use "Binary" directory  containing a STM32PRGFW-UTIL 
 
 ### Hardware prerequisites
 
-* Set boot boot pins  to b000 (BOOT0/1/2 to OFF) position to select **[serial boot](https://wiki.st.com/stm32mpu/wiki/STM32_MPU_ROM_code_overview#Boot_device_selection)**
+* Set boot pins according to table below 
+
+| SOC | **[Serial Boot](https://wiki.st.com/stm32mpu/wiki/STM32_MPU_ROM_code_overview#Boot_device_selection)** Configuration |
+|----|------------------- |
+|MP15, MP13 | b000 (BOOT0/1/2 = OFF) |
+| MP25 | b0000 (BOOT0/1/2/3 = OFF)   |
 * If you want to use USB DFU interface
 
   * connect USB cable between PC and the board. PC shoud test USB DFU interface
@@ -111,7 +116,14 @@ In this mode, you will use STM32CubeIDE and build config Console_SH
 
 ### Hardware prerequisites
 
-* Set boot boot pins to b100  (BOOT2 = ON, BOOT0/1=OFF) position to select [development boot](https://wiki.st.com/stm32mpu/wiki/STM32_MPU_ROM_code_overview#Boot_device_selection) (or also called Engineering boot)
+* Set boot pins as per below table
+
+| SOC | **[Engineering Boot/ Development Mode](https://wiki.st.com/stm32mpu/wiki/STM32_MPU_ROM_code_overview#Boot_device_selection) Configuration** <a name="devmode_bootspins"></a> |
+|----|------------------- |
+|MP15, MP13 | b100 (BOOT2 = ON, BOOT0/1=OFF) |
+| MP25 | b0011 (BOOT2/3 = OFF, BOOT0/1=ON)   |
+
+
 * Connect cable from Board/STLINK connector to the PC
 
 ### STM32CubeIDE Step by Step
@@ -131,7 +143,8 @@ mon arm semihosting_redirect tcp 2323
 ![](_htmresc/1668782761216.png)
 
 * Run Debug configuration and Open TCP window with localhost and port number as described below (Window ->Show View-> Other-> TCP Console)
-* Some command examples:
+* Two consoles are present (1) OTP Console (2) PMIC Console
+* Some command examples for OTP Console:
 
 ```
   $help
@@ -139,7 +152,14 @@ mon arm semihosting_redirect tcp 2323
   $displ word=10
   $write word=10 value=1
 ```
+* Some command examples for PMIC Console:
 
+```
+  $help
+  $displ
+  $write addr=0x90 value=0x01
+  $update
+```
 ![1668782420376](_htmresc/OpenTCPWindow.PNG)
 ![1668782420376](_htmresc/TCPWindow.PNG)
 ## How to Use Console_Uart
@@ -148,13 +168,13 @@ In this mode, you will use STM32CubeIDE and build config Console_UART
 
 ### Hardware prerequisites
 
-* Set boot boot pins to b100  (BOOT2 = ON, BOOT0/1=OFF) position to select **[development boot](https://wiki.st.com/stm32mpu/wiki/STM32_MPU_ROM_code_overview#Boot_device_selection) (or also called Engineering boot)
+* Set boot pins according to this [table](#devmode_bootspins) .
 * Connect cable from Board/STLINK connector to the PC
 
 ### STM32CubeIDE Step by Step
 
-* Depending your own board, you should change UART instance and GPIO into otp_interface_cli_util.h file
-  * By default it is the instance used on ST board (UART4  PD6&PD8 for STM32MP13xx  / UART4 PG11/PB2 for STM32MP15xx)
+* Depending your own board, you should change UART instance and GPIO into console_util.h file
+  * By default it is the instance used on ST board (UART4  PD6&PD8 for STM32MP13xx  / UART4 PG11/PB2 for STM32MP15xx and USART2 PA4&PA8 for MP25xx)
 * Build Project by selecting Console_UART build confiuration
 * Setup Debug Configuration  and in particular (in Startup tab):
 

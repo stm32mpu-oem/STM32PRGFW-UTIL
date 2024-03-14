@@ -26,28 +26,61 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdbool.h>
+
+
+/* Exported types ------------------------------------------------------------*/
+
+typedef enum
+{
+  PMIC_SHADOW_WRITE,
+  PMIC_SHADOW_READ,
+} pmic_nvm_ops_t;
+
+typedef struct
+{
+  int8_t     Supported;
+  uint8_t    Identifier;
+  uint8_t    NVMSize;
+  uint8_t    DisplayString[3];
+  uint8_t    NVMStartAddress;
+  uint8_t    NVMSRRegisterAddr;
+  uint8_t    NVMCRRegisterAddr;
+} pmic_data_t;
+
+/* Exported constants --------------------------------------------------------*/
+#if defined(STPMIC1)
+
+typedef enum
+{
+	PMIC_STPMIC1,
+	PMIC_MAX,
+}pmic_types;
+
+#elif defined(STPMIC2)
+typedef enum
+{
+	PMIC_STPMIC25,
+	PMIC_STPMIC1L,
+	PMIC_STPMIC2L,
+	PMIC_MAX,
+}pmic_types;
+#endif
+
+/* Exported variables --------------------------------------------------------*/
+/* Exported macros -----------------------------------------------------------*/
 
 #if defined(STPMIC1)
-#define PMIC_NVM_SIZE                8    /* Bytes STPMIC1 */
-#define OWN_I2C_SLAVE_ADDRESS       0x33  /* NVM Default   */
-#define PMIC_I2C_ADDRESS        ((0x33U & 0x7FU) << 1)
-#define PMIC_NVM_SR                 0xB8
-#define PMIC_NVM_BUSY_MSK           0x01
-#define PMIC_NVM_CR                 0xB9
-#define PMIC_NVM_SHDW_START_ADDR    0xF8
-#define PMIC_SR_REG_TIMEOUT        1000U
+#define PMIC_VERSION_ID_SR_ADDR     0x06
 #elif defined(STPMIC2)
-#define PMIC_NVM_SIZE                42    /* Bytes STPMIC2 */
-#define OWN_I2C_SLAVE_ADDRESS       0x33  /* NVM Default   */
-#define PMIC_I2C_ADDRESS        ((0x33U & 0x7FU) << 1)
-#define PMIC_NVM_SR                 0x8E
-#define PMIC_NVM_BUSY_MSK           0x01
-#define PMIC_NVM_CR                 0x8F
-#define PMIC_NVM_SHDW_START_ADDR    0x90
-#define PMIC_SR_REG_TIMEOUT         200U
+#define PMIC_PRODUCT_ID_SR_ADDR     0x00
 #endif /* STPMIC1 */
 
-
+#define OWN_I2C_SLAVE_ADDRESS       0x33
+#define PMIC_NVM_BUSY_MSK           0x01
+#define PMIC_I2C_ADDRESS        ((0x33U & 0x7FU) << 1) /* NVM Default   */
+#define PMIC_SR_REG_TIMEOUT        1000U
+#define MAX_PMIC_NVM_SIZE            64
 #if defined (STM32MP157Cxx)
 #define BUS_I2C_INSTANCE                      I2C4
 #define BUS_I2C_CLK_ENABLE()                  __HAL_RCC_I2C4_CLK_ENABLE()
@@ -141,22 +174,12 @@ extern "C" {
 #endif  /* BUS_I2Cx_TIMING */
 
 #endif /* STM32MP135Fxx */
-
-
-/* Exported types ------------------------------------------------------------*/
-
-typedef enum
-{
-  PMIC_SHADOW_WRITE,
-  PMIC_SHADOW_READ,
-} pmic_nvm_ops_t;
-
-/* Exported constants --------------------------------------------------------*/
-/* Exported variables --------------------------------------------------------*/
-/* Exported macros -----------------------------------------------------------*/
+#define PMIC_NOT_SUPPORTED       (-1)
+#define PMIC_SUPPORTED           (0)
 /* Exported functions ------------------------------------------------------- */
 void PMIC_Util_Init(void);
-void PMIC_Util_ReadWrite(uint8_t *addr, pmic_nvm_ops_t ops);
+void PMIC_Util_ReadWrite(uint8_t *addr, pmic_nvm_ops_t ops, pmic_data_t * pmic_data);
+bool PMIC_Util_Detect_PMIC(pmic_data_t * pmic_detected);
 
 #ifdef __cplusplus
 }

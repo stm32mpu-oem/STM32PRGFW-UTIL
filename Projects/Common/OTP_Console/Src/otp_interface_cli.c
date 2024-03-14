@@ -19,7 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "otp_interface_cli.h"
-#include "otp_interface_cli_util.h"
+#include "console_util.h"
 #include "otp_util.h"
 #include <limits.h>
 #include <errno.h>
@@ -37,6 +37,7 @@ typedef enum
   OTP_CMD_DISPL,
   OTP_CMD_WRITE,
   OTP_CMD_LOCK,
+  OTP_CMD_EXIT,
   OTP_CMD_MAX,
 } otp_cmd_id;
 
@@ -59,6 +60,7 @@ const otp_command otp_cmd[OTP_CMD_MAX] =
   [OTP_CMD_DISPL]        = { "displ", 0, OTP_VALUE_SIZE },
   [OTP_CMD_WRITE]        = { "write", 2, ((2 * OTP_VALUE_SIZE) + 2)},
   [OTP_CMD_LOCK]         = { "lock", 1, 2 },
+  [OTP_CMD_EXIT]         = { "exit", 0, 0 }
 };
 
 /* Private define ------------------------------------------------------------*/
@@ -91,7 +93,6 @@ static void lock_otp(uint32_t word);
 static void print_otp_more_status(Otp_TypeDef Otp, uint32_t word);
 
 /* Exported variables --------------------------------------------------------*/
-
 /**
   * @brief print help message
   * @param None
@@ -669,6 +670,13 @@ static void print_lock(int argc, char *argv[])
   }
 }
 
+
+static bool print_exit(int argc, char *argv[])
+{
+  return true;
+}
+
+
 /**
   * @brief free the argv
   * @param argc:
@@ -860,7 +868,7 @@ static int parse_entry_string(char *entry, size_t size, int *command, char *argv
   * @param None
   * @retval None
   */
-void print_header(void)
+void otp_print_header(void)
 {
   /* Output a message on Hyperterminal using printf function */
   printf("\n\r=============== OTP Serial Interface ===============\r");
@@ -873,12 +881,13 @@ void print_header(void)
   * @param None
   * @retval None
   */
-void otp_commands_interactive(void)
+bool otp_commands_interactive(void)
 {
   char buffer[CMD_MAX_LEN];
   char *argv[CMD_MAX_ARG + 1]; /* NULL terminated */
   int argc;
   int cmd;
+  bool ret = false;
 
   /* Init the otp */
   OTP_Util_Init();
@@ -892,7 +901,7 @@ void otp_commands_interactive(void)
   /* if the size is not valid */
   if (argc <= 0)
   {
-    return;
+    return ret;
   }
 
   /* Check the command */
@@ -914,10 +923,16 @@ void otp_commands_interactive(void)
       print_lock(argc, argv);
       break;
 
+    case OTP_CMD_EXIT:
+      ret = print_exit(argc, argv); /* return console control to main console*/
+      break;
+
     default:
       break;
   }
 
   /* reset argc and argv */
   free_args(argc, argv);
+
+  return ret;
 }

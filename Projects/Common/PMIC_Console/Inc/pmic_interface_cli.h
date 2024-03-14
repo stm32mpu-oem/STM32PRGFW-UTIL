@@ -1,12 +1,12 @@
 /**
   ******************************************************************************
-  * @file    pmic_interface.h
-  * @author  GPM Application Team
-  * @brief   Header for pmic_interface.c module
+  * @file    otp_interface_cli.h
+  * @author  MCD Application Team
+  * @brief   Header for otp_interface_cli.c module
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -17,27 +17,25 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef PMIC_INTERFACE_H
-#define PMIC_INTERFACE_H
+#ifndef PMIC_INTERFACE_CLI_H
+#define PMIC_INTERFACE_CLI_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
-#include "pmic_util.h"
+#include <stdbool.h>
+/* Private includes ----------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-/* Exported variables --------------------------------------------------------*/
-/* Exported macros -----------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
-void OPENBL_PMIC_Init(void);
-void OPENBL_PMIC_Read(uint8_t *pDest);
-void OPENBL_PMIC_Write(uint8_t *pSource);
-uint32_t OPENBL_PMIC_Get_NVM_Size(void);
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions prototypes ---------------------------------------------*/
+bool pmic_commands_interactive(void);
+void pmic_print_header(void);
+/* Private defines -----------------------------------------------------------*/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PMIC_INTERFACE_H */
+#endif /* PMIC_INTERFACE_CLI_H */

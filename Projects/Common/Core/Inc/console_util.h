@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file    otp_interface_cli_util.h
+  * @file    console_util.h
   * @author  MCD Application Team
-  * @brief   OTP Interface CLI header
+  * @brief   provide console utilities header
   ******************************************************************************
   * @attention
   *
@@ -17,8 +17,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef OTP_INTERFACE_CLI_UTIL_H
-#define OTP_INTERFACE_CLI_UTIL_H
+#ifndef CONSOLE_UTIL_H
+#define CONSOLE_UTIL_H
 
 /* Private includes ----------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
@@ -84,4 +84,4 @@ void UART_Config(void);
 #define MX_UART_MODE            UART_MODE_TX_RX
 #define MX_UART_OVERSAMPLING    UART_OVERSAMPLING_16
 
-#endif /* OTP_INTERFACE_CLI_UTIL_H */
+#endif /* CONSOLE_UTIL_H */

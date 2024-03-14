@@ -54,6 +54,8 @@
 									<listOptionValue builtIn="false" value="../../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../../../Common/Core/Inc"/>
 									<listOptionValue builtIn="false" value="../../../Common/OTP_Console/Inc"/>
+									<listOptionValue builtIn="false" value="../../../Common/PMIC_Console/Inc"/>
+									<listOptionValue builtIn="false" value="../../../Common/MainMenu_Console/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../Drivers/STM32MP1xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../Drivers/STM32MP1xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../../../../Drivers/CMSIS/Device/ST/STM32MP1xx/Include"/>
@@ -115,7 +117,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Application/Core/pmic_util.c|Application/USB_Device|Application/Openbootloader|Middlewares|Application/Core/syscalls.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Application/USB_Device|Application/Openbootloader|Middlewares|Application/Core/syscalls.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -242,8 +244,11 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.88454289" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1953499919.892763726.946634456" name="console_util.c" rcbsApplicability="disable" resourcePath="Application/Core/console_util.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1653327747.1471599442">
+						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1653327747.1471599442" name="MCU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.1653327747"/>
+					</fileInfo>
 					<sourceEntries>
-						<entry excluding="Application/OTP_Console" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Application/Core/console_util.c|Application/PMIC_Console|Application/MainMenu_Console|Application/OTP_Console" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -303,6 +308,8 @@
 									<listOptionValue builtIn="false" value="../../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../../../Common/Core/Inc"/>
 									<listOptionValue builtIn="false" value="../../../Common/OTP_Console/Inc"/>
+									<listOptionValue builtIn="false" value="../../../Common/PMIC_Console/Inc"/>
+									<listOptionValue builtIn="false" value="../../../Common/MainMenu_Console/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../Drivers/STM32MP1xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../Drivers/STM32MP1xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../../../../Drivers/CMSIS/Device/ST/STM32MP1xx/Include"/>
@@ -489,7 +496,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Application/OTP_Console" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Application/MainMenu_Console|Application/PMIC_Console|Application/OTP_Console" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

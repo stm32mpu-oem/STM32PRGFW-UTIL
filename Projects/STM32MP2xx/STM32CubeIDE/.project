@@ -37,6 +37,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/STM32CubeIDE/syscalls.c</locationURI>
 		</link>
 		<link>
+			<name>Application/Core/console_util.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Common/Core/Src/console_util.c</locationURI>
+		</link>
+		<link>
 			<name>Application/Core/hash_util.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Common/Core/Src/hash_util.c</locationURI>
@@ -67,14 +72,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/stm32mp2xx_it.c</locationURI>
 		</link>
 		<link>
+			<name>Application/MainMenu_Console/mainmenu_interface_cli.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Common/MainMenu_Console/Src/mainmenu_interface_cli.c</locationURI>
+		</link>
+		<link>
 			<name>Application/OTP_Console/otp_interface_cli.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Common/OTP_Console/Src/otp_interface_cli.c</locationURI>
 		</link>
 		<link>
-			<name>Application/OTP_Console/otp_interface_cli_util.c</name>
+			<name>Application/PMIC_Console/pmic_interface_cli.c</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Common/OTP_Console/Src/otp_interface_cli_util.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/Common/PMIC_Console/Src/pmic_interface_cli.c</locationURI>
 		</link>
 		<link>
 			<name>Drivers/CMSIS/irq_ctrl_gic.c</name>
